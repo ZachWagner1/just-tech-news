@@ -21,26 +21,26 @@ router.get('/:id', (req, res) => {
         where: {
             id: req.params.id
         },
-        include    : [
-			{
-				model      : Post,
-				attributes : [ 'id', 'title', 'post_url', 'created_at' ]
-			},
-			{
-				model      : Comment,
-				attributes : [ 'id', 'comment_text', 'created_at' ],
-				include    : {
-					model      : Post,
-					attributes : [ 'title' ]
-				}
-			},
-			{
-				model      : Post,
-				attributes : [ 'title' ],
-				through    : Vote,
-				as         : 'voted_posts'
-			}
-		]
+        include: [
+            {
+                model: Post,
+                attributes: ['id', 'title', 'post_url', 'created_at']
+            },
+            {
+                model: Comment,
+                attributes: ['id', 'comment_text', 'created_at'],
+                include: {
+                    model: Post,
+                    attributes: ['title']
+                }
+            },
+            {
+                model: Post,
+                attributes: ['title'],
+                through: Vote,
+                as: 'voted_posts'
+            }
+        ]
     })
         .then(dbUserData => {
             if (!dbUserData) {
@@ -82,16 +82,16 @@ router.post('/login', (req, res) => {
             return;
         }
 
-       // res.json({ user: dbUserData });
+        // res.json({ user: dbUserData });
 
         // Verify user
         const validPassword = dbUserData.checkPassword(req.body.password);
         if (!validPassword) {
             res.status(400).json({ message: 'Incorrect password!' });
             return;
-          }
-          
-          res.json({ user: dbUserData, message: 'You are now logged in!' });
+        }
+
+        res.json({ user: dbUserData, message: 'You are now logged in!' });
     });
 });
 
