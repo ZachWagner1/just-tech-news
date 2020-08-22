@@ -8,19 +8,19 @@ async function signupFormHandler(event) {
 	// if all signup fields are filled out, make POST request to api/users route to create new user
 	if (username && email && password) {
 		const response = await fetch('/api/users', {
-			method  : 'post',
-			body    : JSON.stringify({
+			method: 'post',
+			body: JSON.stringify({
 				username,
 				email,
 				password
 			}),
-			headers : { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' }
 		});
 		console.log(response);
 
 		// check the response status
 		if (response.ok) {
-			console.log('success');
+			document.location.replace('/dashboard/');
 		} else {
 			alert(response.statusText);
 		}
@@ -36,12 +36,12 @@ async function loginFormHandler(event) {
 
 	if (email && password) {
 		const response = await fetch('/api/users/login', {
-			method  : 'post',
-			body    : JSON.stringify({
+			method: 'post',
+			body: JSON.stringify({
 				email,
 				password
 			}),
-			headers : { 'Content-Type': 'application/json' }
+			headers: { 'Content-Type': 'application/json' }
 		});
 
 		// check the response status

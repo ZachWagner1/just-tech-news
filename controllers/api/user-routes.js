@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const { User, Post, Vote, Comment } = require('../../models');
+const withAuth = require('../../utils/auth');
 
+// GET /api/users
 router.get('/', (req, res) => {
     User.findAll({
         attributes: { exclude: ['password'] }
@@ -12,6 +14,7 @@ router.get('/', (req, res) => {
         });
 });
 
+// GET /api/users/1
 router.get('/:id', (req, res) => {
     User.findOne({
         attributes: { exclude: ['password'] },
@@ -52,14 +55,15 @@ router.get('/:id', (req, res) => {
         });
 });
 
+// POST /api/users -- create user on signup
 router.post('/', (req, res) => {
     User.create({
         username: req.body.username,
         email: req.body.email,
         password: req.body.password
     })
-        // 
-        .then(dbUserData => {
+        //
+        .then((dbUserData) => {
             req.session.save(() => {
                 req.session.user_id = dbUserData.id;
                 req.session.username = dbUserData.username;
@@ -67,10 +71,11 @@ router.post('/', (req, res) => {
 
                 res.json(dbUserData);
             });
-        })
+        });
 });
 
-router.put('/:id', (req, res) => {
+// PUT /api/users/1
+router.put('/:id', withAuth, (req, res) => {
     User.update(req.body, {
         individualHooks: true,
         where: {
@@ -90,7 +95,8 @@ router.put('/:id', (req, res) => {
         });
 });
 
-router.delete('/:id', (req, res) => {
+// DELETE /api/users/1
+router.delete('/:id', withAuth, (req, res) => {
     Comment.destroy({
         where: {
             user_id: req.params.id
@@ -115,14 +121,13 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-
-// login
+// POST /api/users/login -- login
 router.post('/login', (req, res) => {
     User.findOne({
         where: {
             email: req.body.email
         }
-    }).then(dbUserData => {
+    }).then((dbUserData) => {
         if (!dbUserData) {
             res.status(400).json({ message: 'No user with that email address!' });
             return;
@@ -147,15 +152,15 @@ router.post('/login', (req, res) => {
     });
 });
 
+// POST /api/users/logout
 router.post('/logout', (req, res) => {
     if (req.session.loggedIn) {
         req.session.destroy(() => {
             res.status(204).end();
         });
-    }
-    else {
+    } else {
         res.status(404).end();
     }
-})
+});
 
 module.exports = router;
